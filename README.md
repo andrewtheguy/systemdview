@@ -4,7 +4,7 @@ A terminal UI for viewing and browsing systemd services.
 
 ![Rust](https://img.shields.io/badge/rust-stable-orange)
 
-> **Note:** This project is a work in progress and is currently a proof of concept. Features may be incomplete or subject to change.
+> ⚠️ **Warning:** This project is a work in progress and is currently a proof of concept. Features may be incomplete or subject to change.
 
 ## Features
 
