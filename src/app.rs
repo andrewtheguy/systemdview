@@ -14,6 +14,7 @@ pub struct App {
     pub logs_scroll: usize,
     pub last_selected_service: Option<String>,
     pub status_filter: Option<String>,
+    pub show_logs: bool,
 }
 
 impl App {
@@ -30,6 +31,7 @@ impl App {
             logs_scroll: 0,
             last_selected_service: None,
             status_filter: None,
+            show_logs: false,
         };
         app.load_services();
         app
@@ -196,5 +198,9 @@ impl App {
             let max_scroll = self.logs.len().saturating_sub(visible_lines);
             self.logs_scroll = (self.logs_scroll + amount).min(max_scroll);
         }
+    }
+
+    pub fn toggle_logs(&mut self) {
+        self.show_logs = !self.show_logs;
     }
 }

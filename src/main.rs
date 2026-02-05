@@ -18,6 +18,9 @@ fn main() -> io::Result<()> {
         if let Event::Key(key) = event::read()?
             && key.kind == KeyEventKind::Press
         {
+            // Calculate visible lines for log scrolling
+            let visible_lines = ui::get_logs_visible_lines(&terminal.get_frame(), app.show_logs);
+
             if app.search_mode {
                 // Handle search mode input
                 match key.code {
@@ -28,6 +31,18 @@ fn main() -> io::Result<()> {
                         app.search_query.pop();
                         app.update_filter();
                     }
+                    KeyCode::Down => {
+                        app.next();
+                    }
+                    KeyCode::Up => {
+                        app.previous();
+                    }
+                    KeyCode::PageUp => {
+                        app.scroll_logs_up(visible_lines);
+                    }
+                    KeyCode::PageDown => {
+                        app.scroll_logs_down(visible_lines, visible_lines);
+                    }
                     KeyCode::Char(c) => {
                         app.search_query.push(c);
                         app.update_filter();
@@ -35,13 +50,13 @@ fn main() -> io::Result<()> {
                     _ => {}
                 }
             } else {
-                // Calculate visible lines for log scrolling
-                let visible_lines = ui::get_logs_visible_lines(&terminal.get_frame());
-
                 // Normal mode input
                 match key.code {
                     KeyCode::Char('q') => {
                         app.should_quit = true;
+                    }
+                    KeyCode::Char('l') => {
+                        app.toggle_logs();
                     }
                     KeyCode::Esc => {
                         if !app.search_query.is_empty() {
