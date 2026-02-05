@@ -8,6 +8,38 @@ use ratatui::{
 
 use crate::app::App;
 
+/// Layout regions for mouse hit testing
+pub struct LayoutRegions {
+    pub services_list: Rect,
+    pub logs_panel: Option<Rect>,
+}
+
+/// Get layout regions for mouse hit testing
+pub fn get_layout_regions(area: Rect, show_logs: bool) -> LayoutRegions {
+    let chunks = Layout::vertical([
+        Constraint::Length(3),
+        Constraint::Min(1),
+        Constraint::Length(3),
+    ])
+    .split(area);
+
+    let (services_area, logs_area) = if show_logs {
+        let middle = Layout::horizontal([
+            Constraint::Percentage(40),
+            Constraint::Percentage(60),
+        ])
+        .split(chunks[1]);
+        (middle[0], Some(middle[1]))
+    } else {
+        (chunks[1], None)
+    };
+
+    LayoutRegions {
+        services_list: services_area,
+        logs_panel: logs_area,
+    }
+}
+
 pub fn render(frame: &mut Frame, app: &mut App) {
     // Load logs for selected service if selection changed (only if logs are visible)
     if app.show_logs {
@@ -168,32 +200,53 @@ pub fn render(frame: &mut Frame, app: &mut App) {
 
 fn render_help(frame: &mut Frame) {
     let help_text = vec![
-        Line::from(vec![
-            Span::styled("Navigation", Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)),
-        ]),
+        Line::from(vec![Span::styled(
+            "Navigation",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        )]),
         Line::from("  j / Down      Move down"),
         Line::from("  k / Up        Move up"),
         Line::from("  g / Home      Go to top"),
         Line::from("  G / End       Go to bottom"),
         Line::from(""),
-        Line::from(vec![
-            Span::styled("Search & Filter", Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)),
-        ]),
+        Line::from(vec![Span::styled(
+            "Search & Filter",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        )]),
         Line::from("  /             Start search"),
         Line::from("  s             Cycle status filter"),
         Line::from("  S             Clear status filter"),
         Line::from("  Esc           Clear search/filter"),
         Line::from(""),
-        Line::from(vec![
-            Span::styled("Logs Panel", Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)),
-        ]),
+        Line::from(vec![Span::styled(
+            "Logs Panel",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        )]),
         Line::from("  l             Toggle logs panel"),
         Line::from("  PgUp/PgDn     Scroll logs"),
         Line::from("  Ctrl+u/d      Scroll logs half page"),
         Line::from(""),
-        Line::from(vec![
-            Span::styled("Other", Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)),
-        ]),
+        Line::from(vec![Span::styled(
+            "Mouse",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        )]),
+        Line::from("  Click         Select service"),
+        Line::from("  Scroll        Navigate list/logs"),
+        Line::from(""),
+        Line::from(vec![Span::styled(
+            "Other",
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        )]),
         Line::from("  r             Refresh services"),
         Line::from("  ?             Toggle this help"),
         Line::from("  q / Esc       Quit"),
