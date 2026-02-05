@@ -42,8 +42,9 @@ fn main() -> io::Result<()> {
                 continue;
             }
 
-            // Calculate visible lines for log scrolling
+            // Calculate visible lines for scrolling
             let visible_lines = ui::get_logs_visible_lines(&terminal.get_frame(), app.show_logs);
+            let visible_services = ui::get_services_visible_lines(&terminal.get_frame(), app.show_logs);
 
             if app.search_mode {
                 // Handle search mode input
@@ -62,10 +63,18 @@ fn main() -> io::Result<()> {
                         app.previous();
                     }
                     KeyCode::PageUp => {
-                        app.scroll_logs_up(visible_lines);
+                        if app.show_logs {
+                            app.scroll_logs_up(visible_lines);
+                        } else {
+                            app.page_up(visible_services);
+                        }
                     }
                     KeyCode::PageDown => {
-                        app.scroll_logs_down(visible_lines, visible_lines);
+                        if app.show_logs {
+                            app.scroll_logs_down(visible_lines, visible_lines);
+                        } else {
+                            app.page_down(visible_services);
+                        }
                     }
                     KeyCode::Char(c) => {
                         app.search_query.push(c);
@@ -114,10 +123,18 @@ fn main() -> io::Result<()> {
                         app.clear_status_filter();
                     }
                     KeyCode::PageUp => {
-                        app.scroll_logs_up(visible_lines);
+                        if app.show_logs {
+                            app.scroll_logs_up(visible_lines);
+                        } else {
+                            app.page_up(visible_services);
+                        }
                     }
                     KeyCode::PageDown => {
-                        app.scroll_logs_down(visible_lines, visible_lines);
+                        if app.show_logs {
+                            app.scroll_logs_down(visible_lines, visible_lines);
+                        } else {
+                            app.page_down(visible_services);
+                        }
                     }
                     KeyCode::Char('u') if key.modifiers.contains(KeyModifiers::CONTROL) => {
                         app.scroll_logs_up(visible_lines / 2);

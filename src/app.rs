@@ -209,4 +209,23 @@ impl App {
     pub fn toggle_help(&mut self) {
         self.show_help = !self.show_help;
     }
+
+    pub fn page_up(&mut self, page_size: usize) {
+        if self.filtered_indices.is_empty() {
+            return;
+        }
+        let current = self.list_state.selected().unwrap_or(0);
+        let new_index = current.saturating_sub(page_size);
+        self.list_state.select(Some(new_index));
+    }
+
+    pub fn page_down(&mut self, page_size: usize) {
+        if self.filtered_indices.is_empty() {
+            return;
+        }
+        let current = self.list_state.selected().unwrap_or(0);
+        let max_index = self.filtered_indices.len().saturating_sub(1);
+        let new_index = (current + page_size).min(max_index);
+        self.list_state.select(Some(new_index));
+    }
 }

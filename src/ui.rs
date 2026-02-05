@@ -172,7 +172,8 @@ pub fn render(frame: &mut Frame, app: &mut App) {
             .block(
                 Block::default()
                     .borders(Borders::ALL)
-                    .title(format!("{}{}", logs_title, scroll_info)),
+                    .title(format!("{}{}", logs_title, scroll_info))
+                    .border_style(Style::default().fg(Color::Cyan)),
             )
             .wrap(Wrap { trim: false });
 
@@ -229,7 +230,7 @@ fn render_help(frame: &mut Frame) {
                 .add_modifier(Modifier::BOLD),
         )]),
         Line::from("  l             Toggle logs panel"),
-        Line::from("  PgUp/PgDn     Scroll logs"),
+        Line::from("  PgUp/PgDn     Scroll list/logs"),
         Line::from("  Ctrl+u/d      Scroll logs half page"),
         Line::from(""),
         Line::from(vec![Span::styled(
@@ -303,4 +304,27 @@ pub fn get_logs_visible_lines(frame: &Frame, show_logs: bool) -> usize {
     .split(chunks[1]);
 
     middle_chunks[1].height.saturating_sub(2) as usize
+}
+
+/// Returns the number of visible lines in the services list
+pub fn get_services_visible_lines(frame: &Frame, show_logs: bool) -> usize {
+    let chunks = Layout::vertical([
+        Constraint::Length(3),
+        Constraint::Min(1),
+        Constraint::Length(3),
+    ])
+    .split(frame.area());
+
+    let services_area = if show_logs {
+        let middle_chunks = Layout::horizontal([
+            Constraint::Percentage(40),
+            Constraint::Percentage(60),
+        ])
+        .split(chunks[1]);
+        middle_chunks[0]
+    } else {
+        chunks[1]
+    };
+
+    services_area.height.saturating_sub(2) as usize
 }
