@@ -17,6 +17,14 @@ A terminal UI for viewing and browsing systemd services.
 
 ## Installation
 
+### Quick Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/andrewtheguy/systemdview/main/install.sh | bash
+```
+
+### From Source
+
 ```bash
 cargo install --path .
 ```
