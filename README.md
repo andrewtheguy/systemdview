@@ -1,0 +1,72 @@
+# systemdview
+
+A terminal UI for viewing and browsing systemd services.
+
+![Rust](https://img.shields.io/badge/rust-stable-orange)
+
+## Features
+
+- Browse all systemd services with status indicators
+- Search services by name or description
+- Filter by status (running/exited/failed/dead)
+- View service logs in a side panel
+- Vim-style keyboard navigation
+
+## Installation
+
+```bash
+cargo install --path .
+```
+
+## Usage
+
+```bash
+systemdview
+```
+
+## Keyboard Shortcuts
+
+Press `?` in the app to see all shortcuts.
+
+### Navigation
+
+| Key | Action |
+|-----|--------|
+| `j` / `Down` | Move down |
+| `k` / `Up` | Move up |
+| `g` / `Home` | Go to top |
+| `G` / `End` | Go to bottom |
+
+### Search & Filter
+
+| Key | Action |
+|-----|--------|
+| `/` | Start search |
+| `s` | Cycle status filter (running → exited → failed → dead) |
+| `S` | Clear status filter |
+| `Esc` | Clear search/filter |
+
+### Logs Panel
+
+| Key | Action |
+|-----|--------|
+| `l` | Toggle logs panel |
+| `PgUp` / `PgDn` | Scroll logs |
+| `Ctrl+u` / `Ctrl+d` | Scroll logs half page |
+
+### Other
+
+| Key | Action |
+|-----|--------|
+| `r` | Refresh services |
+| `?` | Show help |
+| `q` / `Esc` | Quit |
+
+## Requirements
+
+- Linux with systemd
+- Rust 1.85+ (2024 edition)
+
+## License
+
+MIT
