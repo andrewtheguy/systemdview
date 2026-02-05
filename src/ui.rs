@@ -16,10 +16,26 @@ pub fn render(frame: &mut Frame, app: &mut App) {
     ])
     .split(frame.area());
 
-    // Header
-    let header = Paragraph::new("SystemD Services")
-        .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))
-        .block(Block::default().borders(Borders::ALL));
+    // Header / Search bar
+    let header = if app.search_mode {
+        let search_text = format!("/{}_", app.search_query);
+        Paragraph::new(search_text)
+            .style(Style::default().fg(Color::Yellow))
+            .block(Block::default().borders(Borders::ALL).title("Search"))
+    } else if !app.search_query.is_empty() {
+        let search_info = format!(
+            "Search: {} ({} matches)",
+            app.search_query,
+            app.filtered_indices.len()
+        );
+        Paragraph::new(search_info)
+            .style(Style::default().fg(Color::Green))
+            .block(Block::default().borders(Borders::ALL))
+    } else {
+        Paragraph::new("SystemD Services")
+            .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))
+            .block(Block::default().borders(Borders::ALL))
+    };
     frame.render_widget(header, chunks[0]);
 
     // Services list
@@ -30,8 +46,9 @@ pub fn render(frame: &mut Frame, app: &mut App) {
         frame.render_widget(error_msg, chunks[1]);
     } else {
         let items: Vec<ListItem> = app
-            .services
+            .filtered_indices
             .iter()
+            .map(|&i| &app.services[i])
             .map(|service| {
                 let status_color = service.status_color();
                 let line = Line::from(vec![
@@ -48,12 +65,18 @@ pub fn render(frame: &mut Frame, app: &mut App) {
             })
             .collect();
 
-        let list = List::new(items)
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .title(format!("Services ({})", app.services.len())),
+        let title = if app.search_query.is_empty() {
+            format!("Services ({})", app.services.len())
+        } else {
+            format!(
+                "Services ({}/{})",
+                app.filtered_indices.len(),
+                app.services.len()
             )
+        };
+
+        let list = List::new(items)
+            .block(Block::default().borders(Borders::ALL).title(title))
             .highlight_style(
                 Style::default()
                     .bg(Color::DarkGray)
@@ -65,7 +88,14 @@ pub fn render(frame: &mut Frame, app: &mut App) {
     }
 
     // Footer with keybindings
-    let footer = Paragraph::new("q/Esc: Quit | j/↓: Down | k/↑: Up | g/Home: Top | G/End: Bottom | r: Refresh")
+    let footer_text = if app.search_mode {
+        "Type to search | Esc/Enter: Exit search"
+    } else if !app.search_query.is_empty() {
+        "q: Quit | /: Search | Esc: Clear search | j/k: Navigate | r: Refresh"
+    } else {
+        "q/Esc: Quit | /: Search | j/↓: Down | k/↑: Up | g: Top | G: Bottom | r: Refresh"
+    };
+    let footer = Paragraph::new(footer_text)
         .style(Style::default().fg(Color::DarkGray))
         .block(Block::default().borders(Borders::ALL));
     frame.render_widget(footer, chunks[2]);

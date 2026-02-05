@@ -5,7 +5,9 @@ use std::process::Command;
 #[derive(Debug, Clone, Deserialize)]
 pub struct SystemdService {
     pub unit: String,
+    #[allow(dead_code)]
     pub load: String,
+    #[allow(dead_code)]
     pub active: String,
     pub sub: String,
     pub description: String,
